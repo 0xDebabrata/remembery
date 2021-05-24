@@ -20,6 +20,7 @@ const notion = new Client({
     auth: process.env.NOTION_TOKEN,
 })
 
+// Return name and note of people whose birthday is today
 const getBDays = async () => {
     const filter = {
         property: "Upcoming Birthday",
@@ -47,6 +48,7 @@ exports.lambdaHandler = async (event, context) => {
     try {
         const data = await getBDays()
 
+        // Generate object for SES template data
         const templateData = {
             data: data
         }
