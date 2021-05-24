@@ -13,6 +13,8 @@
 
 require('dotenv').config()
 const { Client } = require('@notionhq/client');
+var aws = require("aws-sdk");
+var ses = new aws.SES({ region: "us-east-1" });
 
 const notion = new Client({
     auth: process.env.NOTION_TOKEN,
@@ -39,11 +41,27 @@ const getBDays = async () => {
 }
 
 exports.lambdaHandler = async (event, context) => {
-
     try {
         const data = await getBDays()
-        console.log("DATA", data)
-        return data
+
+        var params = {
+            Destination: {
+              ToAddresses: ["debabratareviews@gmail.com"],
+            },
+            Message: {
+              Body: {
+                Text: { Data: JSON.stringify(data) },
+              },
+        
+              Subject: { Data: "Birthday Reminder" },
+            },
+            Source: "debabratapi@protonmail.com",
+          };
+
+        console.log("DATA", data, JSON.stringify(data))
+
+        return ses.sendEmail(params).promise()
+
     } catch (err) {
         console.log(err);
         return err;
