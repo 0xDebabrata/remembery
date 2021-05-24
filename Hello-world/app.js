@@ -30,12 +30,15 @@ const getBDays = async () => {
     const payload = {
         path: `databases/${process.env.NOTION_DB_ID}/query`,
         method: 'POST',
-        body: {filter: filter}
+        body: { filter: filter }
     }
     const { results } = await notion.request(payload, filter)
 
     const info = results.map(page => {
-        return page.properties.Name.title[0].plain_text
+        return {
+            name: page.properties.Name.title[0].plain_text,
+            note: page.properties.Note.rich_text[0].text.content, 
+        }
     })
     return info
 }
@@ -58,9 +61,10 @@ exports.lambdaHandler = async (event, context) => {
             Source: "debabratapi@protonmail.com",
           };
 
-        console.log("DATA", data, JSON.stringify(data))
+        // console.log("DATA", data, JSON.stringify(data))
 
-        return ses.sendEmail(params).promise()
+        // return ses.sendEmail(params).promise()
+        return data
 
     } catch (err) {
         console.log(err);
