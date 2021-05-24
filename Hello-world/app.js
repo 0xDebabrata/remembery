@@ -47,24 +47,20 @@ exports.lambdaHandler = async (event, context) => {
     try {
         const data = await getBDays()
 
+        const templateData = {
+            data: data
+        }
+
         var params = {
             Destination: {
-              ToAddresses: ["debabratareviews@gmail.com"],
+              ToAddresses: ['debabratareviews@gmail.com']
             },
-            Message: {
-              Body: {
-                Text: { Data: JSON.stringify(data) },
-              },
-        
-              Subject: { Data: "Birthday Reminder" },
-            },
-            Source: "debabratapi@protonmail.com",
-          };
+            Source: 'debabratapi@protonmail.com',
+            Template: 'remembery',
+            TemplateData: JSON.stringify(templateData),
+        };
 
-        // console.log("DATA", data, JSON.stringify(data))
-
-        // return ses.sendEmail(params).promise()
-        return data
+        return ses.sendTemplatedEmail(params).promise()
 
     } catch (err) {
         console.log(err);

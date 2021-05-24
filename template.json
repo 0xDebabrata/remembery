@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "remembery",
+    "SubjectPart": "Birthday reminder!",
+    "HtmlPart": "<h1>Hello!</h1><p>The following people have their birthday today {{data}}.</p>",
+    "TextPart": "Hello!,\r\nThe following people have their birthday today {{data}}."
+  }
+}
