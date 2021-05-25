@@ -36,10 +36,7 @@ const getBDays = async () => {
     const { results } = await notion.request(payload, filter)
 
     const info = results.map(page => {
-        return {
-            name: page.properties.Name.title[0].plain_text,
-            note: page.properties.Note.rich_text[0].text.content, 
-        }
+        return page.properties.Name.title[0].plain_text
     })
     return info
 }
