@@ -15,6 +15,8 @@ require('dotenv').config()
 const { Client } = require('@notionhq/client');
 var aws = require("aws-sdk");
 var ses = new aws.SES({ region: "us-east-1" });
+const fs = require('fs')
+const Handlebars = require('handlebars')
 
 const notion = new Client({
     auth: process.env.NOTION_TOKEN,
@@ -35,31 +37,46 @@ const getBDays = async () => {
     }
     const { results } = await notion.request(payload, filter)
 
-    const info = results.map(page => {
+    const namesArray = results.map(page => {
         return page.properties.Name.title[0].plain_text
     })
-    return info
+
+    return namesArray
 }
 
 exports.lambdaHandler = async (event, context) => {
     try {
         const data = await getBDays()
 
-        // Generate object for SES template data
-        const templateData = {
-            data: data
-        }
-
+        // Read template and generate HTML
+        const emailData = { names: data }
+        const html = fs.readFileSync("./template.html", "utf-8")
+        const template = Handlebars.compile(html.toString())
+        const emailBodyHtml = template(emailData)
+        
         var params = {
             Destination: {
-              ToAddresses: ['debabratareviews@gmail.com']
+                ToAddresses: ['debabratareviews@gmail.com']
+            },
+            Message: {
+                Body: {
+                    Text: {
+                        Data: 'Hello',
+                        Charset: 'UTF-8'
+                    },
+                    Html: {
+                        Data: emailBodyHtml
+                    }
+                },
+                Subject: {
+                    Data: "Birthday reminder | remembery",
+                    Charset: 'UTF-8'
+                }
             },
             Source: 'debabratapi@protonmail.com',
-            Template: 'remembery',
-            TemplateData: JSON.stringify(templateData),
         };
 
-        return ses.sendTemplatedEmail(params).promise()
+        return ses.sendEmail(params).promise()
 
     } catch (err) {
         console.log(err);
