@@ -45,38 +45,45 @@ const getBDays = async () => {
 }
 
 exports.lambdaHandler = async (event, context) => {
+
     try {
         const data = await getBDays()
 
-        // Read template and generate HTML
-        const emailData = { names: data }
-        const html = fs.readFileSync("./template.html", "utf-8")
-        const template = Handlebars.compile(html.toString())
-        const emailBodyHtml = template(emailData)
-        
-        var params = {
-            Destination: {
-                ToAddresses: ['debabratareviews@gmail.com']
-            },
-            Message: {
-                Body: {
-                    Text: {
-                        Data: 'Hello',
-                        Charset: 'UTF-8'
+        if (data.length === 0) {
+            return "No birthdays today"
+        } else {
+
+             // Read template and generate HTML
+            const emailData = { names: data }
+            const html = fs.readFileSync("./template.html", "utf-8")
+            const template = Handlebars.compile(html.toString())
+            const emailBodyHtml = template(emailData)
+            
+            var params = {
+                Destination: {
+                    ToAddresses: ['debabratareviews@gmail.com']
+                },
+                Message: {
+                    Body: {
+                        Text: {
+                            Data: 'Hello',
+                            Charset: 'UTF-8'
+                        },
+                        Html: {
+                            Data: emailBodyHtml
+                        }
                     },
-                    Html: {
-                        Data: emailBodyHtml
+                    Subject: {
+                        Data: "Birthday reminder | remembery",
+                        Charset: 'UTF-8'
                     }
                 },
-                Subject: {
-                    Data: "Birthday reminder | remembery",
-                    Charset: 'UTF-8'
-                }
-            },
-            Source: 'debabratapi@protonmail.com',
-        };
+                Source: 'debabratapi@protonmail.com',
+            };
 
-        return ses.sendEmail(params).promise()
+            return ses.sendEmail(params).promise()
+
+        }
 
     } catch (err) {
         console.log(err);
