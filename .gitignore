@@ -125,5 +125,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-
+.aws-sam/
+samconfig.toml
 # End of https://www.gitignore.io/api/osx,node,linux,windows
